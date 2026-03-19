@@ -1,0 +1,139 @@
+<view class="player-page">
+  <!-- 背景毛玻璃 -->
+  <image class="bg-blur" src="{{currentSong.cover}}" mode="aspectFill" />
+
+  <!-- 顶部导航 -->
+  <view class="player-nav">
+    <view class="nav-back" bindtap="goBack">
+      <text style="color:#fff;font-size:36rpx">‹</text>
+    </view>
+    <view class="nav-title">
+      <view class="song-name">{{currentSong.name}}</view>
+      <view class="artist-name">{{currentSong.artist}}</view>
+    </view>
+    <view class="nav-share" bindtap="shareSong">
+      <text style="color:#fff;font-size:36rpx">↗</text>
+    </view>
+  </view>
+
+  <!-- 封面 / 歌词切换区域 -->
+  <view class="main-area" bindtap="toggleMode">
+    <!-- 大封面 -->
+    <view class="album-container {{showLyrics ? 'hidden' : ''}}">
+      <image 
+        class="album-cover" 
+        src="{{currentSong.cover}}" 
+        mode="aspectFill"
+        animation="{{albumRotate}}"
+      />
+    </view>
+
+    <!-- 歌词面板 -->
+    <view class="lyrics-container {{showLyrics ? '' : 'hidden'}}">
+      <lyrics 
+        lyrics="{{lyrics}}" 
+        currentTime="{{currentTime}}"
+      />
+    </view>
+  </view>
+
+  <!-- 功能按钮 -->
+  <view class="action-row">
+    <view class="action-btn {{isFavorite ? 'active' : ''}}" bindtap="toggleFavorite">
+      <text style="font-size:36rpx">{{isFavorite ? '❤' : '♡'}}</text>
+    </view>
+    <view class="action-btn" bindtap="downloadSong">
+      <text style="font-size:36rpx">↓</text>
+    </view>
+    <view class="action-btn" bindtap="showPlaylist">
+      <text style="font-size:36rpx">☰</text>
+    </view>
+    <view class="action-btn" bindtap="shareSong">
+      <text style="font-size:36rpx">↗</text>
+    </view>
+  </view>
+
+  <!-- 进度条 -->
+  <view class="progress-section">
+    <view 
+      class="progress-bar" 
+      bindtouchstart="onProgressStart" 
+      bindtouchmove="onProgressMove"
+      bindtouchend="onProgressEnd"
+    >
+      <view class="progress-fill" style="width: {{progress}}%"></view>
+    </view>
+    <view class="time-display">
+      <text>{{currentTimeText}}</text>
+      <text>{{durationText}}</text>
+    </view>
+  </view>
+
+  <!-- 播放控制 -->
+  <view class="play-controls">
+    <view class="mode-btn" bindtap="showModeSelect">
+      <image 
+        src="/static/icons/{{playMode === 'list' ? 'loop' : playMode === 'single' ? 'single' : 'shuffle'}}.png" 
+        mode="aspectFit"
+        style="width:48rpx;height:48rpx;filter:invert(1);opacity:0.8" 
+      />
+    </view>
+    
+    <view class="ctrl-btn prev-btn" bindtap="onPrevTap">
+      <image src="/static/icons/prev.png" mode="aspectFit" style="width:60rpx;height:60rpx;filter:invert(1)" />
+    </view>
+    
+    <view class="play-btn" bindtap="onPlayTap">
+      <image 
+        src="{{isPlaying ? '/static/icons/pause.png' : '/static/icons/play.png'}}" 
+        mode="aspectFit"
+        style="width:64rpx;height:64rpx;filter:invert(1)" 
+      />
+    </view>
+    
+    <view class="ctrl-btn next-btn" bindtap="onNextTap">
+      <image src="/static/icons/next.png" mode="aspectFit" style="width:60rpx;height:60rpx;filter:invert(1)" />
+    </view>
+    
+    <view class="sleep-btn" bindtap="showSleepModal">
+      <image src="/static/icons/sleep.png" mode="aspectFit" style="width:48rpx;height:48rpx;filter:invert(1);opacity:0.8" />
+    </view>
+  </view>
+
+  <!-- 播放模式选择 -->
+  <view class="modal-mask" wx:if="{{showModeSelect}}" bindtap="hideModeSelect">
+    <view class="modal-sheet" catchtap>
+      <view class="modal-title">播放模式</view>
+      <view class="mode-grid">
+        <view class="mode-item {{playMode === 'list' ? 'active' : ''}}" data-mode="list" bindtap="selectMode">
+          <image src="/static/icons/loop.png" mode="aspectFit" style="width:60rpx;height:60rpx;filter:invert(1)" />
+          <text>列表循环</text>
+        </view>
+        <view class="mode-item {{playMode === 'single' ? 'active' : ''}}" data-mode="single" bindtap="selectMode">
+          <image src="/static/icons/single.png" mode="aspectFit" style="width:60rpx;height:60rpx;filter:invert(1)" />
+          <text>单曲循环</text>
+        </view>
+        <view class="mode-item {{playMode === 'random' ? 'active' : ''}}" data-mode="random" bindtap="selectMode">
+          <image src="/static/icons/shuffle.png" mode="aspectFit" style="width:60rpx;height:60rpx;filter:invert(1)" />
+          <text>随机播放</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 定时关闭 -->
+  <view class="modal-mask" wx:if="{{showSleepModal}}" bindtap="hideSleepModal">
+    <view class="modal-sheet" catchtap>
+      <view class="modal-title">定时关闭</view>
+      <view class="sleep-timer" wx:if="{{sleepTimerText}}">{{sleepTimerText}}</view>
+      <view class="sleep-timer" wx:else>已关闭</view>
+      <view class="sleep-options">
+        <view class="sleep-option" data-minutes="5" bindtap="setSleepTimer">5分钟</view>
+        <view class="sleep-option" data-minutes="15" bindtap="setSleepTimer">15分钟</view>
+        <view class="sleep-option" data-minutes="30" bindtap="setSleepTimer">30分钟</view>
+        <view class="sleep-option" data-minutes="60" bindtap="setSleepTimer">1小时</view>
+        <view class="sleep-option" data-minutes="0" bindtap="setSleepTimer">关闭</view>
+      </view>
+    </view>
+  </view>
+</view>

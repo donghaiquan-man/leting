@@ -6,6 +6,7 @@ Page({
   data: {
     themeColors: null,
     songs: [],
+    recentPlays: [],
     currentSong: null,
     isPlaying: false,
     progress: 0,
@@ -20,6 +21,7 @@ Page({
   onShow() {
     this.updateTheme();
     this.loadSongs();
+    this.loadRecentPlays();
     this.setData({
       currentSong: player.currentSong,
       isPlaying: player.isPlaying
@@ -51,6 +53,11 @@ Page({
     }));
 
     this.setData({ songs: songsWithFav });
+  },
+
+  loadRecentPlays() {
+    const recent = player.getPlayHistory?.() || [];
+    this.setData({ recentPlays: recent.slice(0, 6) });
   },
 
   initPlayer() {
@@ -128,6 +135,36 @@ Page({
 
     wx.setStorageSync('favorites', favorites);
     this.setData({ songs });
+  },
+
+  onAlbumClick() {
+    wx.navigateTo({ url: '/pages/player/player' });
+  },
+
+  onRecentTap(e) {
+    const { index } = e.currentTarget.dataset;
+    const song = this.data.recentPlays[index];
+    if (!song) return;
+    player.setPlaylist(this.data.recentPlays, index);
+    player.playSong(song, index);
+    this.setData({ currentSong: song });
+  },
+
+  showMore(e) {
+    const { index } = e.currentTarget.dataset;
+    const song = this.data.songs[index];
+    wx.showActionSheet({
+      itemList: ['添加到播放列表', '收藏', '分享', '查看详情'],
+      success: (res) => {
+        if (res.tapIndex === 1) {
+          this.toggleFavorite(e);
+        }
+      }
+    });
+  },
+
+  goToHistory() {
+    wx.switchTab({ url: '/pages/mine/mine' });
   },
 
   toggleTheme() {

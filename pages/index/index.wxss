@@ -11,9 +11,6 @@
   justify-content: space-between;
   padding: 30rpx 40rpx 20rpx;
   background: var(--card-background);
-  position: sticky;
-  top: 0;
-  z-index: 100;
 }
 
 .header-title {
@@ -37,16 +34,121 @@
   justify-content: center;
 }
 
+/* 区块 */
+.section {
+  padding: 24rpx 32rpx 0;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.section-count {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.section-more {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+/* 最近播放 */
+.recent-scroll {
+  display: flex;
+  white-space: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8rpx;
+}
+
+.recent-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.recent-item {
+  display: inline-flex;
+  flex-direction: column;
+  width: 180rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.recent-item.playing .recent-cover {
+  border: 4rpx solid var(--primary);
+  box-sizing: border-box;
+}
+
+.recent-cover-wrap {
+  position: relative;
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+
+.recent-cover {
+  width: 100%;
+  height: 100%;
+  background: var(--border);
+}
+
+.play-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.recent-item:active .play-overlay {
+  opacity: 1;
+}
+
+.recent-name {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: var(--text);
+  margin-top: 12rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recent-artist {
+  font-size: 22rpx;
+  color: var(--text-secondary);
+  margin-top: 4rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* 歌曲列表 */
 .song-list {
-  padding: 16rpx 0;
+  padding: 8rpx 0;
 }
 
 .song-item {
   display: flex;
   align-items: center;
-  padding: 20rpx 32rpx;
-  transition: background 0.2s;
+  padding: 16rpx 32rpx;
+  transition: background 0.15s;
 }
 
 .song-item:active {
@@ -54,33 +156,65 @@
 }
 
 .song-item.playing {
-  background: var(--card-background);
+  background: rgba(212, 60, 51, 0.06);
 }
 
-/* 序号 */
-.song-index {
+/* 播放状态 */
+.song-status {
   width: 56rpx;
-  font-size: 28rpx;
-  color: var(--text-secondary);
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 
-.song-index.playing {
-  color: var(--primary);
+.index-num {
+  font-size: 28rpx;
+  color: var(--text-secondary);
 }
 
-.index-text {
-  font-size: 28rpx;
+.playing-indicator {
+  display: flex;
+  align-items: flex-end;
+  gap: 3rpx;
+  height: 28rpx;
+}
+
+.playing-indicator .bar {
+  width: 5rpx;
+  background: var(--primary);
+  border-radius: 3rpx;
+  animation: soundWave 0.8s ease-in-out infinite alternate;
+}
+
+.playing-indicator .bar:nth-child(1) {
+  height: 40%;
+  animation-delay: 0s;
+}
+
+.playing-indicator .bar:nth-child(2) {
+  height: 80%;
+  animation-delay: 0.2s;
+}
+
+.playing-indicator .bar:nth-child(3) {
+  height: 55%;
+  animation-delay: 0.4s;
+}
+
+@keyframes soundWave {
+  0% { transform: scaleY(0.4); }
+  100% { transform: scaleY(1); }
 }
 
 /* 封面 */
 .song-cover {
-  width: 100rpx;
-  height: 100rpx;
+  width: 96rpx;
+  height: 96rpx;
   border-radius: 16rpx;
   margin: 0 24rpx;
   flex-shrink: 0;
+  background: var(--border);
 }
 
 /* 歌曲信息 */
@@ -105,27 +239,28 @@
 .song-artist {
   font-size: 24rpx;
   color: var(--text-secondary);
-  margin-top: 8rpx;
+  margin-top: 6rpx;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* 收藏按钮 */
-.song-action {
-  width: 80rpx;
-  height: 80rpx;
+/* 操作按钮 */
+.song-actions {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 8rpx;
   flex-shrink: 0;
 }
 
-/* 分割线 */
-.song-item:not(:last-child) .song-info::after {
-  content: '';
-  display: block;
-  height: 1rpx;
-  background: var(--border);
-  margin-top: 20rpx;
+.action-icon {
+  width: 72rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-icon.faved {
+  opacity: 1;
 }

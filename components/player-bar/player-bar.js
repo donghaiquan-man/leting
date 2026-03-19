@@ -45,6 +45,10 @@ Component({
       this.triggerEvent('next');
     },
 
+    onProgressTap(e) {
+      e.stopPropagation();
+    },
+
     onAlbumTap() {
       this.triggerEvent('albumclick');
     }

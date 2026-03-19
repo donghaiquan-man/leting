@@ -1,5 +1,5 @@
-<view class="player-bar" bindtap="onAlbumTap">
-  <view class="progress-bar">
+<view class="player-bar" bindtap="onAlbumTap" data-song="{{song.id}}">
+  <view class="progress-bar" catchtap="onProgressTap">
     <view class="progress-fill" style="width: {{progress}}%"></view>
   </view>
   

@@ -1,7 +1,7 @@
 <view class="index-page">
   <!-- 顶部区域 -->
   <view class="header">
-    <view class="header-title">乐听</view>
+    <view class="header-title">🎵 乐听</view>
     <view class="header-actions">
       <view class="theme-btn" bindtap="toggleTheme">
         <image 
@@ -13,7 +13,40 @@
     </view>
   </view>
 
-  <!-- 歌曲列表 -->
+  <!-- 最近播放 -->
+  <view class="section" wx:if="{{recentPlays.length > 0}}">
+    <view class="section-header">
+      <view class="section-title">最近播放</view>
+      <view class="section-more" bindtap="goToHistory">查看全部</view>
+    </view>
+    <scroll-view class="recent-scroll" scroll-x enable-flex>
+      <view 
+        wx:for="{{recentPlays}}" 
+        wx:key="id"
+        class="recent-item {{item.id === currentSong.id ? 'playing' : ''}}"
+        data-index="{{index}}"
+        bindtap="onRecentTap"
+      >
+        <view class="recent-cover-wrap">
+          <image class="recent-cover" src="{{item.cover}}" mode="aspectFill" />
+          <view class="play-overlay">
+            <image src="/static/icons/play.png" mode="aspectFit" style="width:40rpx;height:40rpx;filter:invert(1)" />
+          </view>
+        </view>
+        <view class="recent-name">{{item.name}}</view>
+        <view class="recent-artist">{{item.artist}}</view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 全部歌曲 -->
+  <view class="section">
+    <view class="section-header">
+      <view class="section-title">全部歌曲</view>
+      <view class="section-count">{{songs.length}}首</view>
+    </view>
+  </view>
+
   <view class="song-list">
     <view 
       wx:for="{{songs}}" 
@@ -22,16 +55,14 @@
       data-index="{{index}}"
       bindtap="onSongTap"
     >
-      <!-- 序号 -->
-      <view class="song-index {{item.id === currentSong.id ? 'playing' : ''}}">
-        <text wx:if="{{item.id !== currentSong.id}}" class="index-text">{{index + 1}}</text>
-        <image 
-          wx:else 
-          src="/static/icons/play.png" 
-          mode="aspectFit" 
-          class="playing-icon"
-          style="width:32rpx;height:32rpx;filter:invert(1)" 
-        />
+      <!-- 播放状态图标 -->
+      <view class="song-status">
+        <view wx:if="{{item.id === currentSong.id && isPlaying}}" class="playing-indicator">
+          <view class="bar"></view>
+          <view class="bar"></view>
+          <view class="bar"></view>
+        </view>
+        <text wx:else class="index-num">{{index + 1}}</text>
       </view>
 
       <!-- 封面 -->
@@ -39,17 +70,22 @@
 
       <!-- 歌曲信息 -->
       <view class="song-info">
-        <view class="song-name {{item.id === currentSong.id ? 'playing' : ''}}">{{item.name}}</view>
+        <view class="song-name {{item.id === currentSong.id && isPlaying ? 'playing' : ''}}">{{item.name}}</view>
         <view class="song-artist">{{item.artist}}</view>
       </view>
 
-      <!-- 收藏按钮 -->
-      <view class="song-action" data-index="{{index}}" catchtap="toggleFavorite">
-        <image 
-          src="{{item.isFavorite ? '/static/icons/heart-filled.png' : '/static/icons/heart.png'}}" 
-          mode="aspectFit" 
-          style="width:36rpx;height:36rpx;opacity:{{item.isFavorite?1:0.4}}" 
-        />
+      <!-- 操作按钮 -->
+      <view class="song-actions">
+        <view class="action-icon {{item.isFavorite ? 'faved' : ''}}" data-index="{{index}}" catchtap="toggleFavorite">
+          <image 
+            src="{{item.isFavorite ? '/static/icons/heart-filled.png' : '/static/icons/heart.png'}}" 
+            mode="aspectFit" 
+            style="width:36rpx;height:36rpx;filter:{{item.isFavorite?'none':'invert(1)'}};opacity:{{item.isFavorite?'1':'0.35'}}" 
+          />
+        </view>
+        <view class="action-icon more-btn" data-index="{{index}}" catchtap="showMore">
+          <image src="/static/icons/more.png" mode="aspectFit" style="width:36rpx;height:36rpx;filter:invert(1);opacity:0.35" />
+        </view>
       </view>
     </view>
   </view>
@@ -63,5 +99,6 @@
     bind:play="onPlayTap"
     bind:prev="onPrevTap"
     bind:next="onNextTap"
+    bind:albumclick="onAlbumClick"
   />
 </view>
