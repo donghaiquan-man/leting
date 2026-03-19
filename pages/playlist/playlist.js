@@ -26,10 +26,17 @@ Page({
 
   updateTheme() {
     const theme = app.globalData.isDarkMode ? 'dark' : 'light';
+    const colors = app.globalData.themeColors[theme];
     this.setData({
-      themeColors: app.globalData.themeColors[theme],
+      themeColors: colors,
       isDarkMode: app.globalData.isDarkMode
     });
+
+    wx.setNavigationBarColor({
+      frontColor: app.globalData.isDarkMode ? '#ffffff' : '#000000',
+      backgroundColor: colors.background
+    });
+    wx.setNavigationBarTitle({ title: '播放列表' });
   },
 
   loadPlaylist() {

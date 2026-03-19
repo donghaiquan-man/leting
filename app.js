@@ -30,10 +30,26 @@ App({
   },
 
   updateTheme() {
-    const theme = this.globalData.isDarkMode ? 'dark' : 'light';
+    const isDarkMode = this.globalData.isDarkMode;
+    const theme = isDarkMode ? 'dark' : 'light';
     const colors = this.globalData.themeColors[theme];
+
     wx.setStorageSync('themeColors', colors);
-    wx.setStorageSync('isDarkMode', this.globalData.isDarkMode);
+    wx.setStorageSync('isDarkMode', isDarkMode);
+
+    // 更新导航栏颜色
+    wx.setNavigationBarColor({
+      frontColor: isDarkMode ? '#ffffff' : '#000000',
+      backgroundColor: colors.background
+    });
+
+    // 更新 TabBar 颜色
+    wx.setTabBarStyle({
+      color: isDarkMode ? '#999999' : '#999999',
+      selectedColor: colors.primary,
+      backgroundColor: colors.cardBackground,
+      borderStyle: isDarkMode ? 'black' : 'white'
+    });
   },
 
   toggleTheme() {
