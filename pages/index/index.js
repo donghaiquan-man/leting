@@ -5,19 +5,11 @@ const app = getApp();
 Page({
   data: {
     themeColors: null,
+    songs: [],
     currentSong: null,
     isPlaying: false,
-    currentTime: 0,
-    duration: 0,
     progress: 0,
-    showLyrics: false,
-    lyrics: [],
-    showModeSelect: false,
-    showSleepModal: false,
-    playMode: 'list',
-    playModeIndex: 0,
-    sleepTimerRemaining: 0,
-    sleepTimerText: ''
+    isDarkMode: false
   },
 
   onLoad() {
@@ -27,8 +19,9 @@ Page({
 
   onShow() {
     this.updateTheme();
+    this.loadSongs();
     this.setData({
-      currentSong: player.currentSong || songs[0],
+      currentSong: player.currentSong,
       isPlaying: player.isPlaying
     });
   },
@@ -39,19 +32,25 @@ Page({
       themeColors: app.globalData.themeColors[theme],
       isDarkMode: app.globalData.isDarkMode
     });
-    
-    if (app.globalData.isDarkMode) {
-      wx.pageScrollTo({ selector: '.index-page', duration: 0 });
-      wx.setNavigationBarColor({
-        frontColor: '#ffffff',
-        backgroundColor: '#1a1a1a'
-      });
-    } else {
-      wx.setNavigationBarColor({
-        frontColor: '#ffffff',
-        backgroundColor: '#000000'
-      });
-    }
+
+    wx.setNavigationBarColor({
+      frontColor: app.globalData.isDarkMode ? '#ffffff' : '#000000',
+      backgroundColor: app.globalData.themeColors[theme].background
+    });
+    wx.setNavigationBarTitle({ title: '乐听' });
+  },
+
+  loadSongs() {
+    // 加载收藏状态
+    const favorites = wx.getStorageSync('favorites') || [];
+    const favoriteIds = favorites.map(s => s.id);
+
+    const songsWithFav = songs.map(song => ({
+      ...song,
+      isFavorite: favoriteIds.includes(song.id)
+    }));
+
+    this.setData({ songs: songsWithFav });
   },
 
   initPlayer() {
@@ -64,41 +63,33 @@ Page({
 
     player.on('timeUpdate', ({ currentTime, duration }) => {
       const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
-      this.setData({
-        currentTime,
-        duration,
-        progress,
-        currentTimeText: Player.formatTime(currentTime),
-        durationText: Player.formatTime(duration)
-      });
+      this.setData({ progress });
+    });
+
+    player.on('songChange', () => {
+      this.setData({ currentSong: player.currentSong });
+      this.loadSongs(); // 更新播放状态
     });
 
     player.on('ended', () => {
       this.setData({ isPlaying: false });
     });
 
-    player.on('sleepTimerUpdate', (remaining) => {
-      this.setData({
-        sleepTimerRemaining: remaining,
-        sleepTimerText: remaining > 0 ? Player.formatTime(remaining) : ''
-      });
-    });
-
-    player.on('sleepTimerEnd', () => {
-      this.setData({
-        showSleepModal: false,
-        sleepTimerText: ''
-      });
-      wx.showToast({
-        title: '定时关闭已生效',
-        icon: 'none'
-      });
-    });
-
     this.setData({
       currentSong: player.currentSong,
-      lyrics: Player.parseLyrics(player.currentSong?.lyrics || '')
+      songs: songs.map(song => ({ ...song, isFavorite: false }))
     });
+    this.loadSongs();
+  },
+
+  onSongTap(e) {
+    const { index } = e.currentTarget.dataset;
+    const song = this.data.songs[index];
+
+    player.setPlaylist(this.data.songs, index);
+    player.playSong(song, index);
+
+    this.setData({ currentSong: song });
   },
 
   onPlayTap() {
@@ -107,95 +98,40 @@ Page({
 
   onPrevTap() {
     player.prev();
-    this.updateSongInfo();
+    this.setData({ currentSong: player.currentSong });
+    this.loadSongs();
   },
 
   onNextTap() {
     player.next();
-    this.updateSongInfo();
+    this.setData({ currentSong: player.currentSong });
+    this.loadSongs();
   },
 
-  updateSongInfo() {
-    setTimeout(() => {
-      this.setData({
-        currentSong: player.currentSong,
-        lyrics: Player.parseLyrics(player.currentSong?.lyrics || '')
-      });
-    }, 100);
-  },
+  toggleFavorite(e) {
+    const { index } = e.currentTarget.dataset;
+    const songs = [...this.data.songs];
+    const song = songs[index];
 
-  onProgressTap(e) {
-    const { duration } = this.data;
-    const { x } = e.detail;
-    const { width } = e.currentTarget.dataset;
-    const time = (x / width) * duration;
-    player.seek(time);
-  },
+    let favorites = wx.getStorageSync('favorites') || [];
+    const favIndex = favorites.findIndex(s => s.id === song.id);
 
-  onProgressChange(e) {
-    const { value } = e.detail;
-    const { duration } = this.data;
-    const time = (value / 100) * duration;
-    player.seek(time);
-  },
+    if (favIndex >= 0) {
+      favorites.splice(favIndex, 1);
+      songs[index].isFavorite = false;
+      wx.showToast({ title: '已取消收藏', icon: 'none' });
+    } else {
+      favorites.unshift(song);
+      songs[index].isFavorite = true;
+      wx.showToast({ title: '已添加收藏', icon: 'none' });
+    }
 
-  toggleLyrics() {
-    this.setData({
-      showLyrics: !this.data.showLyrics
-    });
+    wx.setStorageSync('favorites', favorites);
+    this.setData({ songs });
   },
 
   toggleTheme() {
     app.toggleTheme();
     this.updateTheme();
-  },
-
-  showModeSelectModal() {
-    this.setData({ showModeSelect: true });
-  },
-
-  hideModeSelectModal() {
-    this.setData({ showModeSelect: false });
-  },
-
-  selectPlayMode(e) {
-    const { mode } = e.currentTarget.dataset;
-    const modeIndex = ['list', 'single', 'random'].indexOf(mode);
-    player.setPlayMode(mode);
-    this.setData({
-      playMode: mode,
-      playModeIndex: modeIndex,
-      showModeSelect: false
-    });
-  },
-
-  showSleepModal() {
-    this.setData({ showSleepModal: true });
-  },
-
-  hideSleepModal() {
-    this.setData({ showSleepModal: false });
-  },
-
-  setSleepTimer(e) {
-    const { minutes } = e.currentTarget.dataset;
-    player.setSleepTimer(minutes);
-    this.setData({ showSleepModal: false });
-    
-    if (minutes > 0) {
-      wx.showToast({
-        title: `将在 ${minutes} 分钟后关闭`,
-        icon: 'none'
-      });
-    } else {
-      wx.showToast({
-        title: '已关闭定时关闭',
-        icon: 'none'
-      });
-    }
-  },
-
-  onUnload() {
-    // 保持播放器运行，不销毁
   }
 });

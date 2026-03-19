@@ -1,134 +1,67 @@
 <view class="index-page">
-  <!-- 封面区域 -->
-  <view class="album-section">
-    <image class="album-bg" src="{{currentSong.cover}}" mode="aspectFill" />
-    
-    <image 
-      class="album-cover" 
-      src="{{currentSong.cover}}" 
-      mode="aspectFill"
-      class="{{showLyrics ? 'hidden' : ''}}"
-      bindtap="toggleLyrics"
-    />
-    
-    <!-- 歌词区域 -->
-    <view class="lyrics-section {{showLyrics ? '' : 'hidden'}}">
-      <lyrics 
-        lyrics="{{lyrics}}" 
-        currentTime="{{currentTime}}"
-        bind:tap="toggleLyrics"
-      />
+  <!-- 顶部区域 -->
+  <view class="header">
+    <view class="header-title">乐听</view>
+    <view class="header-actions">
+      <view class="theme-btn" bindtap="toggleTheme">
+        <image 
+          src="{{isDarkMode ? '/static/icons/sun.png' : '/static/icons/moon.png'"}} 
+          mode="aspectFit" 
+          style="width:36rpx;height:36rpx;filter:{{isDarkMode?'none':'invert(1)'}}" 
+        />
+      </view>
     </view>
   </view>
 
-  <!-- 歌词切换按钮 -->
-  <view class="lyrics-toggle" bindtap="toggleLyrics">
-    <image src="/static/icons/lyrics.png" mode="aspectFit" style="width:32rpx;height:32rpx;filter:{{isDarkMode?'invert(1)':'none'}}" />
-  </view>
+  <!-- 歌曲列表 -->
+  <view class="song-list">
+    <view 
+      wx:for="{{songs}}" 
+      wx:key="id"
+      class="song-item {{item.id === currentSong.id ? 'playing' : ''}}"
+      data-index="{{index}}"
+      bindtap="onSongTap"
+    >
+      <!-- 序号 -->
+      <view class="song-index {{item.id === currentSong.id ? 'playing' : ''}}">
+        <text wx:if="{{item.id !== currentSong.id}}" class="index-text">{{index + 1}}</text>
+        <image 
+          wx:else 
+          src="/static/icons/play.png" 
+          mode="aspectFit" 
+          class="playing-icon"
+          style="width:32rpx;height:32rpx;filter:invert(1)" 
+        />
+      </view>
 
-  <!-- 主题切换按钮 -->
-  <view class="theme-toggle" bindtap="toggleTheme">
-    <image src="{{isDarkMode ? '/static/icons/sun.png' : '/static/icons/moon.png'}}" mode="aspectFit" style="width:32rpx;height:32rpx;filter:{{isDarkMode?'none':'invert(1)'}}" />
-  </view>
+      <!-- 封面 -->
+      <image class="song-cover" src="{{item.cover}}" mode="aspectFill" />
 
-  <!-- 歌曲信息 -->
-  <view class="control-section">
-    <view class="song-title">{{currentSong.name}}</view>
-    <view class="artist-name">{{currentSong.artist}}</view>
-  </view>
+      <!-- 歌曲信息 -->
+      <view class="song-info">
+        <view class="song-name {{item.id === currentSong.id ? 'playing' : ''}}">{{item.name}}</view>
+        <view class="song-artist">{{item.artist}}</view>
+      </view>
 
-  <!-- 进度条 -->
-  <view class="progress-section">
-    <view class="progress-bar" bindtouchend="onProgressTap">
-      <view class="progress-fill" style="width: {{progress}}%"></view>
-    </view>
-    <view class="time-display">
-      <text>{{currentTimeText || '00:00'}}</text>
-      <text>{{durationText || '00:00'}}</text>
-    </view>
-  </view>
-
-  <!-- 播放控制 -->
-  <view class="play-controls">
-    <view class="mode-btn" bindtap="showModeSelectModal">
-      <image 
-        class="mode-icon" 
-        src="/static/icons/{{playMode === 'list' ? 'loop' : playMode === 'single' ? 'single' : 'shuffle'}}.png" 
-        mode="aspectFit"
-        style="filter:{{isDarkMode?'invert(1)':'none'}}"
-      />
-    </view>
-    
-    <view class="control-icon" bindtap="onPrevTap">
-      <image src="/static/icons/prev.png" mode="aspectFit" style="width:60rpx;height:60rpx;filter:{{isDarkMode?'invert(1)':'none'}}" />
-    </view>
-    
-    <view class="play-btn" bindtap="onPlayTap">
-      <image 
-        class="play-icon" 
-        src="{{isPlaying ? '/static/icons/pause.png' : '/static/icons/play.png'}}" 
-        mode="aspectFit"
-      />
-    </view>
-    
-    <view class="control-icon" bindtap="onNextTap">
-      <image src="/static/icons/next.png" mode="aspectFit" style="width:60rpx;height:60rpx;filter:{{isDarkMode?'invert(1)':'none'}}" />
-    </view>
-    
-    <view class="sleep-btn" bindtap="showSleepModal">
-      <image src="/static/icons/sleep.png" mode="aspectFit" style="width:44rpx;height:44rpx;filter:{{isDarkMode?'invert(1)':'none'}}" />
+      <!-- 收藏按钮 -->
+      <view class="song-action" data-index="{{index}}" catchtap="toggleFavorite">
+        <image 
+          src="{{item.isFavorite ? '/static/icons/heart-filled.png' : '/static/icons/heart.png'}}" 
+          mode="aspectFit" 
+          style="width:36rpx;height:36rpx;filter:{{item.isFavorite?'none':'none'}};opacity:{{item.isFavorite?'1':'0.4'}}" 
+        />
+      </view>
     </view>
   </view>
 
   <!-- 迷你播放条 -->
   <player-bar 
+    wx:if="{{currentSong}}"
     song="{{currentSong}}"
     isPlaying="{{isPlaying}}"
     progress="{{progress}}"
     bind:play="onPlayTap"
     bind:prev="onPrevTap"
     bind:next="onNextTap"
-    bind:albumclick="toggleLyrics"
   />
-
-  <!-- 播放模式选择弹窗 -->
-  <view class="mode-select-modal" wx:if="{{showModeSelect}}" bindtap="hideModeSelectModal">
-    <view class="mode-select-content" catchtap>
-      <view class="mode-title">播放模式</view>
-      <view class="mode-options">
-        <view 
-          class="mode-option {{playMode === 'list' ? 'active' : ''}}" 
-          data-mode="list"
-          bindtap="selectPlayMode"
-        >列表循环</view>
-        <view 
-          class="mode-option {{playMode === 'single' ? 'active' : ''}}" 
-          data-mode="single"
-          bindtap="selectPlayMode"
-        >单曲循环</view>
-        <view 
-          class="mode-option {{playMode === 'random' ? 'active' : ''}}" 
-          data-mode="random"
-          bindtap="selectPlayMode"
-        >随机播放</view>
-      </view>
-    </view>
-  </view>
-
-  <!-- 定时关闭弹窗 -->
-  <view class="sleep-modal" wx:if="{{showSleepModal}}" bindtap="hideSleepModal">
-    <view class="sleep-content" catchtap>
-      <view class="sleep-title">定时关闭</view>
-      <view class="sleep-timer" wx:if="{{sleepTimerText}}">{{sleepTimerText}}</view>
-      <view class="sleep-timer" wx:else>已关闭</view>
-      <view class="sleep-options">
-        <view class="sleep-option" data-minutes="5" bindtap="setSleepTimer">5分钟</view>
-        <view class="sleep-option" data-minutes="15" bindtap="setSleepTimer">15分钟</view>
-        <view class="sleep-option" data-minutes="30" bindtap="setSleepTimer">30分钟</view>
-        <view class="sleep-option" data-minutes="60" bindtap="setSleepTimer">1小时</view>
-        <view class="sleep-option" data-minutes="0" bindtap="setSleepTimer">关闭</view>
-      </view>
-      <view class="cancel-btn" bindtap="hideSleepModal">取消</view>
-    </view>
-  </view>
 </view>
