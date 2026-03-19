@@ -1,0 +1,90 @@
+<view class="search-page">
+  <!-- 搜索框 -->
+  <view class="search-header">
+    <view class="search-input-wrapper">
+      <image class="search-icon" src="/static/icons/search.png" mode="aspectFit" style="filter:{{isDarkMode?'invert(1)':'none'}}" />
+      <input 
+        class="search-input"
+        type="text"
+        placeholder="搜索歌曲、歌手"
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+        bindconfirm="onSearchConfirm"
+      />
+      <view wx:if="{{searchKeyword}}" bindtap="clearSearch">
+        <image class="clear-btn" src="/static/icons/close.png" mode="aspectFit" style="filter:{{isDarkMode?'invert(1)':'none'}}" />
+      </view>
+    </view>
+  </view>
+
+  <!-- 搜索结果 -->
+  <view class="search-results" wx:if="{{searchKeyword && searchResults.length > 0}}">
+    <view class="section-title">搜索结果</view>
+    <view 
+      wx:for="{{searchResults}}" 
+      wx:key="id"
+      class="result-item"
+      data-index="{{index}}"
+      bindtap="playSong"
+    >
+      <image class="result-cover" src="{{item.cover}}" mode="aspectFill" />
+      <view class="result-info">
+        <view class="result-name">{{item.name}}</view>
+        <view class="result-artist">{{item.artist}} - {{item.album}}</view>
+      </view>
+      <view class="play-btn-small">
+        <image src="/static/icons/play.png" mode="aspectFit" style="width:28rpx;height:28rpx;filter:invert(1)" />
+      </view>
+    </view>
+  </view>
+
+  <!-- 无搜索结果 -->
+  <view class="empty-state" wx:if="{{searchKeyword && searchResults.length === 0}}">
+    <image class="empty-icon" src="/static/icons/search.png" mode="aspectFit" style="filter:{{isDarkMode?'invert(1)':'none'}};opacity:0.3" />
+    <view class="empty-text">未找到相关歌曲</view>
+  </view>
+
+  <!-- 搜索历史 -->
+  <view class="history-section" wx:if="{{!searchKeyword && searchHistory.length > 0}}">
+    <view class="section-title flex-between">
+      <text>搜索历史</text>
+      <view class="clear-history" bindtap="clearSearchHistory">清空</view>
+    </view>
+    <view class="history-list">
+      <view 
+        wx:for="{{searchHistory}}" 
+        wx:key="index"
+        class="history-item"
+        data-text="{{item}}"
+        bindtap="onHistoryItemTap"
+      >
+        <image class="history-icon" src="/static/icons/history.png" mode="aspectFit" style="filter:{{isDarkMode?'invert(1)':'none'}}" />
+        <text class="history-text">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 热门搜索 -->
+  <view class="hot-search" wx:if="{{!searchKeyword}}">
+    <view class="section-title">热门搜索</view>
+    <view class="hot-tags">
+      <view 
+        wx:for="{{hotSearch}}" 
+        wx:key="index"
+        class="hot-tag"
+        data-text="{{item.text}}"
+        bindtap="onHotSearchTap"
+      >
+        <text>{{item.icon}} {{item.text}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 迷你播放条 -->
+  <player-bar 
+    wx:if="{{player.currentSong}}"
+    song="{{player.currentSong}}"
+    isPlaying="{{player.isPlaying}}"
+    progress="0"
+  />
+</view>

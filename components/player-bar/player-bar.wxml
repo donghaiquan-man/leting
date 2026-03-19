@@ -1,0 +1,26 @@
+<view class="player-bar" bindtap="onAlbumTap">
+  <view class="progress-bar">
+    <view class="progress-fill" style="width: {{progress}}%"></view>
+  </view>
+  
+  <image class="album-cover" src="{{song.cover}}" mode="aspectFill" />
+  
+  <view class="song-info">
+    <view class="song-name">{{song.name}}</view>
+    <view class="artist-name">{{song.artist}}</view>
+  </view>
+  
+  <view class="controls">
+    <button class="control-btn" bindtap="onPrevTap" hover-class="none">
+      <image src="/static/icons/prev.png" mode="aspectFit" style="width:44rpx;height:44rpx;filter:{{themeColors.text === '#ffffff'?'invert(1)':'none'}}" />
+    </button>
+    
+    <button class="play-btn" bindtap="onPlayTap" hover-class="none">
+      <image src="{{isPlaying ? '/static/icons/pause.png' : '/static/icons/play.png'}}" mode="aspectFit" style="width:40rpx;height:40rpx;filter:invert(1)" />
+    </button>
+    
+    <button class="control-btn" bindtap="onNextTap" hover-class="none">
+      <image src="/static/icons/next.png" mode="aspectFit" style="width:44rpx;height:44rpx;filter:{{themeColors.text === '#ffffff'?'invert(1)':'none'}}" />
+    </button>
+  </view>
+</view>

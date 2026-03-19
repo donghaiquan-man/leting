@@ -1,0 +1,91 @@
+<view class="mine-page">
+  <!-- 用户信息头部 -->
+  <view class="user-header">
+    <view class="user-info">
+      <view class="avatar">🎵</view>
+      <view class="user-name">音乐爱好者</view>
+    </view>
+    <view class="stats-row">
+      <view class="stat-item">
+        <view class="stat-num">{{favorites.length}}</view>
+        <view class="stat-label">收藏</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-num">{{playHistory.length}}</view>
+        <view class="stat-label">历史</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-num">1</view>
+        <view class="stat-label">关注</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 收藏列表 -->
+  <view class="section">
+    <view class="section-header">
+      <view class="section-title">我的收藏</view>
+      <view class="section-action" bindtap="goToSearch">发现更多</view>
+    </view>
+    
+    <view class="fav-list" wx:if="{{favorites.length > 0}}">
+      <view 
+        wx:for="{{favorites}}" 
+        wx:key="id"
+        class="fav-item"
+      >
+        <image class="fav-cover" src="{{item.cover}}" mode="aspectFill" />
+        <view class="fav-info" data-index="{{index}}" bindtap="playSong">
+          <view class="fav-name">{{item.name}}</view>
+          <view class="fav-artist">{{item.artist}}</view>
+        </view>
+        <view class="fav-actions">
+          <view class="play-btn-small" data-index="{{index}}" bindtap="playSong">
+            <image src="/static/icons/play.png" mode="aspectFit" style="width:28rpx;height:28rpx;filter:invert(1)" />
+          </view>
+          <view class="action-icon" data-index="{{index}}" bindtap="toggleFavorite">
+            <image src="/static/icons/heart-filled.png" mode="aspectFit" style="width:44rpx;height:44rpx" />
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <view class="empty-state" wx:else>
+      <image class="empty-icon" src="/static/icons/heart.png" mode="aspectFit" style="filter:{{isDarkMode?'invert(1)':'none'}}" />
+      <view class="empty-text">暂无收藏<br/>快去发现喜欢的音乐吧</view>
+    </view>
+  </view>
+
+  <!-- 播放历史 -->
+  <view class="history-section" wx:if="{{playHistory.length > 0}}">
+    <view class="section-header">
+      <view class="section-title">最近播放</view>
+      <view class="section-action" bindtap="goToPlaylist">播放列表</view>
+    </view>
+    
+    <view class="history-grid">
+      <view 
+        wx:for="{{playHistory}}" 
+        wx:key="id"
+        wx:if="{{index < 4}}"
+        class="history-card"
+        data-index="{{index}}"
+        bindtap="playHistorySong"
+      >
+        <image class="history-cover" src="{{item.cover}}" mode="aspectFill" />
+        <view class="history-name">{{item.name}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 迷你播放条 -->
+  <player-bar 
+    wx:if="{{currentSong}}"
+    song="{{currentSong}}"
+    isPlaying="{{isPlaying}}"
+    progress="0"
+    bind:play="togglePlay"
+    bind:prev="prev"
+    bind:next="next"
+  />
+</view>

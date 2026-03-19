@@ -1,0 +1,64 @@
+<view class="playlist-page">
+  <!-- 头部 -->
+  <view class="header">
+    <view class="header-title">播放列表</view>
+    <view class="header-info">共 {{playlist.length}} 首歌曲</view>
+    <view class="header-actions">
+      <view class="action-btn" bindtap="playAll">
+        <image src="/static/icons/play.png" mode="aspectFit" style="width:28rpx;height:28rpx;filter:invert(1)" />
+        <text>播放全部</text>
+      </view>
+      <view class="action-btn" bindtap="shufflePlay">
+        <image src="/static/icons/shuffle.png" mode="aspectFit" style="width:28rpx;height:28rpx;filter:invert(1)" />
+        <text>随机播放</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 歌曲列表 -->
+  <view class="song-list">
+    <view 
+      wx:for="{{playlist}}" 
+      wx:key="id"
+      class="song-item {{index === currentIndex ? 'playing' : ''}}"
+      data-index="{{index}}"
+      bindtap="playSong"
+    >
+      <view class="song-index">
+        <view wx:if="{{index === currentIndex && isPlaying}}" class="playing-indicator">
+          <view class="playing-bar"></view>
+          <view class="playing-bar"></view>
+          <view class="playing-bar"></view>
+        </view>
+        <text wx:else>{{index + 1}}</text>
+      </view>
+      
+      <image class="song-cover" src="{{item.cover}}" mode="aspectFill" />
+      
+      <view class="song-details">
+        <view class="song-name">{{item.name}}</view>
+        <view class="artist-name">{{item.artist}}</view>
+      </view>
+      
+      <view class="song-actions" catchtap>
+        <view class="action-icon" data-index="{{index}}" bindtap="moveToTop">
+          <image src="/static/icons/top.png" mode="aspectFit" style="width:44rpx;height:44rpx;filter:{{isDarkMode?'invert(1)':'none'}}" />
+        </view>
+        <view class="action-icon delete-btn" data-index="{{index}}" bindtap="deleteSong">
+          <image src="/static/icons/delete.png" mode="aspectFit" style="width:44rpx;height:44rpx" />
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 迷你播放条 -->
+  <player-bar 
+    wx:if="{{currentIndex >= 0}}"
+    song="{{playlist[currentIndex]}}"
+    isPlaying="{{isPlaying}}"
+    progress="0"
+    bind:play="togglePlay"
+    bind:prev="prev"
+    bind:next="next"
+  />
+</view>

@@ -1,0 +1,13 @@
+<view class="lyrics-container">
+  <scroll-view class="lyrics-scroll" scroll-y scroll-top="{{scrollTop}}" enhanced show-scrollbar="{{false}}">
+    <view class="lyrics-list">
+      <view 
+        wx:for="{{lyrics}}" 
+        wx:key="index" 
+        class="lyrics-line {{index === activeIndex ? 'active' : ''}} {{item.text === '' ? 'empty' : ''}}"
+      >
+        {{item.text}}
+      </view>
+    </view>
+  </scroll-view>
+</view>
