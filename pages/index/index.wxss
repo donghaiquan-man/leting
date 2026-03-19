@@ -4,36 +4,6 @@
   padding-bottom: 130rpx;
 }
 
-/* 顶部区域 */
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 30rpx 40rpx 20rpx;
-  background: var(--card-background);
-}
-
-.header-title {
-  font-size: 44rpx;
-  font-weight: 700;
-  color: var(--primary);
-}
-
-.header-actions {
-  display: flex;
-  gap: 20rpx;
-}
-
-.theme-btn {
-  width: 64rpx;
-  height: 64rpx;
-  background: var(--background);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* 区块 */
 .section {
   padding: 24rpx 32rpx 0;

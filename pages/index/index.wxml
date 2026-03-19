@@ -1,44 +1,4 @@
 <view class="index-page">
-  <!-- 顶部区域 -->
-  <view class="header">
-    <view class="header-title">🎵 乐听</view>
-    <view class="header-actions">
-      <view class="theme-btn" bindtap="toggleTheme">
-        <image 
-          src="{{isDarkMode ? '/static/icons/sun.png' : '/static/icons/moon.png'}}" 
-          mode="aspectFit" 
-          style="width:36rpx;height:36rpx;filter:{{isDarkMode?'none':'invert(1)'}}" 
-        />
-      </view>
-    </view>
-  </view>
-
-  <!-- 最近播放 -->
-  <view class="section" wx:if="{{recentPlays.length > 0}}">
-    <view class="section-header">
-      <view class="section-title">最近播放</view>
-      <view class="section-more" bindtap="goToHistory">查看全部</view>
-    </view>
-    <scroll-view class="recent-scroll" scroll-x enable-flex>
-      <view 
-        wx:for="{{recentPlays}}" 
-        wx:key="id"
-        class="recent-item {{item.id === currentSong.id ? 'playing' : ''}}"
-        data-index="{{index}}"
-        bindtap="onRecentTap"
-      >
-        <view class="recent-cover-wrap">
-          <image class="recent-cover" src="{{item.cover}}" mode="aspectFill" />
-          <view class="play-overlay">
-            <image src="/static/icons/play.png" mode="aspectFit" style="width:40rpx;height:40rpx;filter:invert(1)" />
-          </view>
-        </view>
-        <view class="recent-name">{{item.name}}</view>
-        <view class="recent-artist">{{item.artist}}</view>
-      </view>
-    </scroll-view>
-  </view>
-
   <!-- 全部歌曲 -->
   <view class="section">
     <view class="section-header">
