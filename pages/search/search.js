@@ -18,7 +18,10 @@ Page({
       { text: '简单爱', icon: '❤️' },
       { text: '夜曲', icon: '🌙' }
     ],
-    isSearching: false
+    isSearching: false,
+    currentSong: null,
+    isPlaying: false,
+    progress: 0
   },
 
   onLoad() {
@@ -28,6 +31,39 @@ Page({
 
   onShow() {
     this.updateTheme();
+    this.loadPlayerState();
+  },
+
+  loadPlayerState() {
+    this.setData({
+      currentSong: player.currentSong,
+      isPlaying: player.isPlaying
+    });
+
+    player.on('playStateChange', (isPlaying) => {
+      this.setData({ isPlaying });
+    });
+
+    player.on('songChange', () => {
+      this.setData({ currentSong: player.currentSong });
+    });
+
+    player.on('timeUpdate', ({ currentTime, duration }) => {
+      const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+      this.setData({ progress });
+    });
+  },
+
+  onPlayTap() {
+    player.togglePlay();
+  },
+
+  onPrevTap() {
+    player.prev();
+  },
+
+  onNextTap() {
+    player.next();
   },
 
   updateTheme() {

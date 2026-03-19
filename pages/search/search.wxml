@@ -82,9 +82,12 @@
 
   <!-- 迷你播放条 -->
   <player-bar 
-    wx:if="{{player.currentSong}}"
-    song="{{player.currentSong}}"
-    isPlaying="{{player.isPlaying}}"
-    progress="0"
+    wx:if="{{currentSong}}"
+    song="{{currentSong}}"
+    isPlaying="{{isPlaying}}"
+    progress="{{progress}}"
+    bind:play="onPlayTap"
+    bind:prev="onPrevTap"
+    bind:next="onNextTap"
   />
 </view>
