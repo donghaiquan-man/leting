@@ -48,7 +48,7 @@ App({
       color: isDarkMode ? '#999999' : '#999999',
       selectedColor: colors.primary,
       backgroundColor: colors.cardBackground,
-      borderStyle: isDarkMode ? 'black' : 'white'
+      borderStyle: isDarkMode ? 'white' : 'white'
     });
   },
 
