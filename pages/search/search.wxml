@@ -2,7 +2,7 @@
   <!-- 搜索框 -->
   <view class="search-header">
     <view class="search-input-wrapper">
-      <image class="search-icon" src="/static/icons/search.png" mode="aspectFit" style="filter:{{isDarkMode?'invert(1)':'none'}}" />
+      <text class="search-icon-text">🔍</text>
       <input 
         class="search-input"
         type="text"
@@ -12,7 +12,7 @@
         bindconfirm="onSearchConfirm"
       />
       <view wx:if="{{searchKeyword}}" bindtap="clearSearch">
-        <image class="clear-btn" src="/static/icons/close.png" mode="aspectFit" style="filter:{{isDarkMode?'invert(1)':'none'}}" />
+        <text class="clear-btn-text">✕</text>
       </view>
     </view>
   </view>

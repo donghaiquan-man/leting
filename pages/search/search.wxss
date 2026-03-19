@@ -24,6 +24,13 @@
   opacity: 0.5;
 }
 
+.search-icon-text {
+  font-size: 36rpx;
+  margin-right: 12rpx;
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
 .search-input {
   flex: 1;
   font-size: 28rpx;
@@ -32,6 +39,12 @@
 
 .search-input::placeholder {
   color: var(--text-secondary);
+}
+
+.clear-btn-text {
+  font-size: 32rpx;
+  opacity: 0.4;
+  padding: 8rpx;
 }
 
 .clear-btn {
